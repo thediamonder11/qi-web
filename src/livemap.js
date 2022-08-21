@@ -11,6 +11,11 @@ class Map extends React.Component {
   render() {
     const bounds = new window.google.maps.LatLngBounds();
     const locations = this.props.locations;
+    
+    const panTo = React.useCallback(({ lat, lng }) => {
+    mapRef.current.panTo({ lat, lng });
+    mapRef.current.setZoom(14);
+  }, []);
 
     for (var i = 0; i < locations.length; i++) {
       bounds.extend(locations[i]);
@@ -18,6 +23,7 @@ class Map extends React.Component {
     this.map && this.map.fitBounds(bounds);
 
     return (
+      <Locate panTo={panTo} />
       <GoogleMap ref={elem => this.map = elem} >
         {this.props.locations.map((location, index) => (
           <Marker
@@ -42,6 +48,28 @@ class Map extends React.Component {
     );
   }
 }
+
+function Locate({ panTo }) {
+  return (
+    <button
+      className="locate"
+      onClick={() => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            panTo({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
+          },
+          () => null
+        );
+      }}
+    >
+      <img src="/compass.svg" alt="compass" />
+    </button>
+  );
+}
+
 
 const LiveMap = compose(
   withProps({
