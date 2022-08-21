@@ -3,6 +3,15 @@ import { compose, withProps } from 'recompose';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker, InfoWindow } from 'react-google-maps';
 import driver from './assets/driver.png';
 
+navigator.geolocation.getCurrentPosition(
+    function (position) {
+        initMap(position.coords.latitude, position.coords.longitude);
+    },
+    function errorCallback(error) {
+        console.log(error);
+    }
+);
+
 class Map extends React.Component {
   state = {
     selectedLocation: null,
@@ -53,5 +62,18 @@ const LiveMap = compose(
   withScriptjs,
   withGoogleMap,
 )(Map);
-
+function initMap(lat, lng) {
+    var myLatLng = {
+        lat,
+        lng,
+    };
+var map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: myLatLng,
+    });
+var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+    });
+}
 export default LiveMap;
